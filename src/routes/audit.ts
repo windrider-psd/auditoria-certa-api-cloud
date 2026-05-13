@@ -5,7 +5,7 @@ import { CreateAudit } from "../services/AuditService.js"
 
 export default (fastify: FastifyInstance) => {
   fastify.addHook("preHandler", fastify.authenticate)
-  fastify.post('/post', {
+  fastify.post('/', {
   }, async (req, res) => {
     const args = req.body as CreateAuditArgs
 

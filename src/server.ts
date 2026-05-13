@@ -17,7 +17,7 @@ const server = fastify({
 })
 
 server.register(fastifyCors, {
-    origin: "*",
+    origin: true,
     methods:["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 })
 

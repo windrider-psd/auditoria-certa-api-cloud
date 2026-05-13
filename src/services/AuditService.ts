@@ -1,5 +1,5 @@
 
-import { CloudAuditEntry, CloudAuditEntryItem, CloudProduct, Company, LocalProduct, Store, User } from '../db/models.js'
+import { CloudAuditEntry, CloudAuditEntryItem, CloudProduct, Company, Store, User } from '../db/models.js'
 import { CreateAuditArgs } from "../db/types.js"
 import { Attributes } from '@sequelize/core'
 import { connection } from '../db/db.js'

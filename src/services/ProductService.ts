@@ -1,5 +1,5 @@
 import { Op } from '@sequelize/core'
-import { CloudProduct, LocalProduct } from '../db/models.js'
+import { CloudProduct } from '../db/models.js'
 
 export async function GetCloudProductByCode(code: string, companyToken:string) {
   return CloudProduct.findOne({
@@ -15,7 +15,7 @@ export async function GetCloudProductByEan(ean: string, companyToken:string) {
     where: {
       ean: {
         [Op.ne]: '',
-        [Op.eq]: ean
+        [Op.eq]: String(ean)
       },
       companyToken
     }

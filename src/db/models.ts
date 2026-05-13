@@ -176,45 +176,6 @@ export class Store extends Model<InferAttributes<Store>, InferCreationAttributes
   declare listId: number
 }
 
-@Table({ tableName: 'parametrosempresa', timestamps: false })
-export class LocalParameters extends Model<
-  InferAttributes<LocalParameters>,
-  InferCreationAttributes<LocalParameters>
-> {
-  @Attribute(DataTypes.INTEGER)
-  @PrimaryKey
-  @AutoIncrement
-  @ColumnName('codigo')
-  declare id: CreationOptional<number>
-
-  @Attribute(DataTypes.INTEGER)
-  @ColumnName('codempresa')
-  declare companyId: number
-
-  @Attribute(DataTypes.STRING(50))
-  @ColumnName('nomeparametro')
-  declare key: string
-
-  @Attribute(DataTypes.STRING(300))
-  @ColumnName('parametro')
-  declare value: string
-
-  @Attribute(DataTypes.TEXT)
-  @ColumnName('observacao')
-  declare obs: string
-
-  @Attribute(DataTypes.STRING(10))
-  @ColumnName('tipo')
-  declare type: string
-
-  @Attribute(DataTypes.STRING(50))
-  @ColumnName('tabela')
-  declare table: string
-
-  @Attribute(DataTypes.STRING(50))
-  @ColumnName('campo')
-  declare field: string
-}
 
 @Table({ tableName: 'integraloja_produto', timestamps: false })
 export class CloudProduct extends Model<
@@ -237,38 +198,6 @@ export class CloudProduct extends Model<
   @Index
   @ColumnName('empresa_token')
   declare companyToken: string
-
-  @Attribute(DataTypes.STRING(200))
-  @NotNull
-  @ColumnName('descricao')
-  declare description: string
-
-  @Attribute(DataTypes.STRING(14))
-  @ColumnName('ean')
-  declare ean: string
-
-  @Attribute(DataTypes.DECIMAL(15, 2))
-  @ColumnName('valorvenda')
-  declare sellingValue: number
-
-  @Attribute(DataTypes.DECIMAL(15, 2))
-  @ColumnName('valorcusto')
-  declare costValue: number
-
-  @Attribute(DataTypes.DECIMAL(15, 4))
-  @ColumnName('saldoestoque')
-  declare stockBalance: number
-}
-
-@Table({ tableName: 'produto', timestamps: false })
-export class LocalProduct extends Model<
-  InferAttributes<LocalProduct>,
-  InferCreationAttributes<LocalProduct>
-> {
-  @Attribute(DataTypes.INTEGER)
-  @PrimaryKey
-  @ColumnName('idproduto')
-  declare id: CreationOptional<number>
 
   @Attribute(DataTypes.STRING(200))
   @NotNull

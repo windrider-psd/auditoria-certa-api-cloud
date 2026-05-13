@@ -1,12 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { hash, verify } from '@node-rs/argon2';
 import { Static, Type } from '@sinclair/typebox'
 import SessionService from "../services/SessionService.js";
 import { GetLogin, Login } from "../services/AuthService.js";
-import { UserLogin } from "../db/types.js";
 
 const LoginSchema = Type.Object({
-  user: Type.String(),
+  username: Type.String(),
   password: Type.String(),
   storeToken: Type.String()
 })
@@ -23,11 +21,11 @@ export default (fastify: FastifyInstance) => {
     }
   }, async (req, res) => {
     const login = await Login({
-      username: req.body.user,
+      username: req.body.username,
       password: req.body.password,
       storeToken: req.body.storeToken
     })
-
+    console.log(req.body)
     if (login) {
       const token = SessionService.GenerateSessionToken()
       await SessionService.CreateSession(token, login)
