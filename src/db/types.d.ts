@@ -17,6 +17,7 @@ export type Audit = AuditEntry[]
 export type UserLogin = Attributes<CompanyLoginAssociation> & {
   user: Attributes<User>
   company: Attributes<Company>
+  storeToken:string
 }
 
 

@@ -53,7 +53,8 @@ server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply)
 })
 
 server.register(autoLoad, {
-    dir: join(__dirname, 'routes')
+    dir: join(__dirname, 'routes'),
+    maxDepth:1
 })
 
 export default server

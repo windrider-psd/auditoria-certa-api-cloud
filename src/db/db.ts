@@ -6,7 +6,6 @@ import { PostgresDialect } from '@sequelize/postgres';
 import env from '../consts/env.js';
 import { CloudAuditEntry, CloudAuditEntryItem, CloudProduct, Company, CompanyLoginAssociation, Store, User } from './models.js';
 
-console.log(import.meta.url)
 export const connection = new Sequelize({
 	dialect: PostgresDialect,
 	database: env.Db.Database,
