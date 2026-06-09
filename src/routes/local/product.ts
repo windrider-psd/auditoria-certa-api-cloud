@@ -11,9 +11,8 @@ export default (fastify: FastifyInstance) => {
         
         const response = await MakeWsRequest(token, {
           method: "GET",
-          url: "/parameters?query=" + req.query.query,
+          url: "/products/query?query=" + req.query.query,
         })
-    
         if (response.payload.status >= 400) {
           return res.code(response.payload.status).send({ message: response.payload.error || "Erro ao criar auditoria" })
         }

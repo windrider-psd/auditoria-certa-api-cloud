@@ -1,11 +1,10 @@
 import { FastifyInstance } from "fastify"
 import { CreateAuditArgs } from "../../db/types.js"
-import { CreateAudit } from "../../services/AuditService.js"
 import { MakeWsRequest } from "../../wsserver.js"
 
 export default (fastify: FastifyInstance) => {
   fastify.addHook("preHandler", fastify.authenticate)
-  fastify.post('/', {
+  fastify.post('/local/audits/', {
   }, async (req, res) => {
     const args = req.body as CreateAuditArgs
     const token = req.session.storeToken

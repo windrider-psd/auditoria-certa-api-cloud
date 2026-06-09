@@ -147,7 +147,7 @@ wss.on("connection", (socket: SocketClient) => {
                         pending.reject(message.payload.error);
                     }
                     else {
-                        pending.resolve(message.payload.body as WsResponseMessage);
+                        pending.resolve(message as WsResponseMessage);
                     }
 
                 }

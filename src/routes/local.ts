@@ -7,4 +7,6 @@ export default (fastify: FastifyInstance) => {
       dir: join(__dirname, 'local'),
       prefix: "/local",
   })
+  console.log(fastify.printRoutes())
+
 }
