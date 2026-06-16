@@ -111,10 +111,29 @@ export function isStoreAuthenticated(storeToken: string): boolean {
 wss.on("connection", (socket: SocketClient) => {
 
     wss.on('close', () => {
+        console.log("WebSocket server closed");
         if(socket.store){
             authenticatedClients.delete(socket.store.storeToken);
         }
     })
+    wss.on('error', (err) => {
+        console.error("WebSocket server error", err);
+    })
+
+    wss.on('wsClientError ', (err) => {
+        console.error("WebSocket client error", err);
+    })
+
+    socket.on('error', (err) => {
+        console.error("WebSocket error", err);
+    })
+
+    socket.on('close', () => {
+        console.log("WebSocket client disconnected");
+        if(socket.store){
+            authenticatedClients.delete(socket.store.storeToken);
+        }
+     })
 
     socket.on("message", async (raw) => {
         try {
