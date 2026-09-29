@@ -219,6 +219,10 @@ export class CloudProduct extends Model<
   @Attribute(DataTypes.DECIMAL(15, 4))
   @ColumnName('saldoestoque')
   declare stockBalance: number
+
+  @Attribute(DataTypes.DATE)
+  @ColumnName('data_gravacao')
+  declare updated: Date 
 }
 
 @Table({

@@ -47,7 +47,8 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
 
           description: local?.description || '',
           ean: local?.ean || '',
-          id: local?.id || undefined
+          id: local?.id || undefined,
+          updated: now
         }
         if (obj.id === undefined) delete obj.id
 
@@ -99,7 +100,8 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
           costValue: local.costValue,
           sellingValue: local.sellingValue,
           description: local.description,
-          ean: cloud.ean
+          ean: cloud.ean,
+          updated: now
         },
         { where: { id: cloud.id } }
       )
