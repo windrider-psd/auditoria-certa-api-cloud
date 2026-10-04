@@ -9,7 +9,11 @@ export type UserSession = {
     
 } & UserLogin
 
-
+function createExpirationDate(): Date {
+    const now = new Date();
+    now.setMonth(now.getMonth() + 1);
+    return now;
+}
 
 export default class SessionService {
     static GenerateSessionToken(): string {
@@ -23,7 +27,7 @@ export default class SessionService {
         const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
         const session: UserSession = {
             ...login,
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+            expiresAt: createExpirationDate(),
             sessionId,
         };
 
@@ -46,20 +50,15 @@ export default class SessionService {
             return Promise.resolve(null);
         }
 
+        return Promise.resolve(session);
+        /*
         if (Date.now() >= session.expiresAt.getTime()) {
             sessions.delete(`session:${sessionId}`);
             userSessions[session.userId].splice(userSessions[session.userId].indexOf(session.sessionId), 1)
             return Promise.resolve(null);
         }
-        if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
-            session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-
-            sessions.set(
-                `session:${session.id}`,
-                session
-            );
-        }
-        return Promise.resolve(session);
+        
+        return Promise.resolve(session);*/
     }
 
     static InvalidateSession(sessionId: string, userId: number): Promise<void> {

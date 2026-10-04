@@ -69,6 +69,7 @@ const pendingRequests: Map<string, { promise: Promise<WsResponseMessage>, resolv
 export async function MakeWsRequest(storeToken:string, payload: WsRequestPayload) {
     const socket = authenticatedClients.get(storeToken);
     if(!socket || !socket.isAuthenticated){
+        console.error("Store not authenticated or WebSocket connection not established");
         throw new Error("Store not authenticated or WebSocket connection not established");
     }
     const id = generateRequestId();
@@ -78,6 +79,7 @@ export async function MakeWsRequest(storeToken:string, payload: WsRequestPayload
         payload: payload
     };
 
+    console.log("Sending WebSocket request", message);
     socket.send(JSON.stringify(message));
     let resolveFunc: (res: WsResponseMessage) => void = () => { };
     let rejectFunc: (err: any) => void = () => { };
@@ -116,16 +118,20 @@ wss.on("connection", (socket: SocketClient) => {
             authenticatedClients.delete(socket.store.storeToken);
         }
     })
+
     wss.on('error', (err) => {
         console.error("WebSocket server error", err);
+        socket.close();
     })
 
     wss.on('wsClientError ', (err) => {
         console.error("WebSocket client error", err);
+        socket.close();
     })
 
     socket.on('error', (err) => {
         console.error("WebSocket error", err);
+        socket.close();
     })
 
     socket.on('close', () => {
@@ -134,6 +140,12 @@ wss.on("connection", (socket: SocketClient) => {
             authenticatedClients.delete(socket.store.storeToken);
         }
      })
+
+     socket.on('ping', () => {
+        console.log("Received ping from client");
+        socket.pong();
+     });
+     
 
     socket.on("message", async (raw) => {
         try {
@@ -160,8 +172,10 @@ wss.on("connection", (socket: SocketClient) => {
             }
 
             else if (message.type === "response"  && socket.isAuthenticated) {
+                console.log("Received WebSocket response", message);
                 const pending = pendingRequests.get(message.id);
                 if (pending) {
+                    console.log("Resolving pending request", message.id, message);
                     if (message.payload.status >= 400) {
                         pending.reject(message.payload.error);
                     }
@@ -169,6 +183,9 @@ wss.on("connection", (socket: SocketClient) => {
                         pending.resolve(message as WsResponseMessage);
                     }
 
+                }
+                else{
+                    console.error("No pending request found for response", message);
                 }
             }
             else if (message.type === "auth") {

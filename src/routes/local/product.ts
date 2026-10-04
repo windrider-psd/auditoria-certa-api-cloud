@@ -78,4 +78,26 @@ export default (fastify: FastifyInstance) => {
       return response.payload.body
     }
   })
+
+  fastify.put<{
+    Params: { id: string },
+      Body: { total: number }
+  }>('/local/products/auto-function/:id', {
+  }, async (req, res) => {
+    const token = req.session.storeToken
+
+    const response = await MakeWsRequest(token, {
+      method: "PUT",
+      url: "/products/auto-function/" + req.params.id,
+      body: {
+        total: req.body.total
+      }
+    })
+    if (response.payload.status >= 400) {
+      return res.code(response.payload.status).send({ message: response.payload.error || "Erro ao pesquisar produtos" })
+    }
+    else {
+      return response.payload.body
+    }
+  })
 }

@@ -13,7 +13,7 @@ const __dirname = dirname(__filename)
 
 
 const server = fastify({
-    logger: true
+    logger: false
 })
 
 server.register(fastifyCors, {
@@ -48,7 +48,7 @@ server.addHook("preHandler", async (req, reply) => {
 
 server.decorate("authenticate", async (req: FastifyRequest, reply: FastifyReply) => {
     if (req.session == null) {
-        return reply.status(401).send({ error: 'Invalid or expired token' });
+        return reply.status(401).send({ message : 'Sessão inválida ou expirada' });
     }
 })
 
