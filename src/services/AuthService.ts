@@ -4,7 +4,7 @@ import { UserLogin } from '../db/types.js'
 interface LoginParams {
   username: string
   password: string,
-  storeToken: string
+  storeToken?: string
 }
 
 
@@ -16,16 +16,16 @@ interface PreLoginParams {
 export async function PreLogin(params: PreLoginParams) {
   const user = await User.findOne({
     where: {
-      login: params.username, 
+      login: params.username,
       password: String(params.password),
-      active:true
+      active: true
     }
   })
 
-  if(!user){
+  if (!user) {
     return null
   }
-  
+
   const validCompanies = await Company.findAll({
     where: {
       active: true
@@ -33,66 +33,96 @@ export async function PreLogin(params: PreLoginParams) {
     include: [Store]
   })
 
-  return validCompanies
+  return {companies: validCompanies, user}
 }
 
 
 export async function Login(params: LoginParams) {
-  const association = await CompanyLoginAssociation.findOne({
-    include: [
-      {
-        model: User,
-        where: {
-          login: params.username,
-          password: params.password,
-          active: true
-        }
-      },
-      {
-        model: Company,
-        where:{
-          active: true
-        },
-        include: [
-          {
-            model: Store,
-            where: {
-              storeToken: params.storeToken
-            }
+  let association
+  if (params.storeToken == undefined) {
+
+
+    association = await CompanyLoginAssociation.findOne({
+      include: [
+        {
+          model: User,
+          where: {
+            login: params.username,
+            password: params.password,
+            active: true
           }
-        ]
-      }
-    ]
-  })
+        },
+        {
+          model: Company,
+          where: {
+            active: true
+          },
+          include: [
+            {
+              model: Store,
+              where: {
+                storeToken: params.storeToken
+              }
+            }
+          ]
+        }
+      ]
+    })
+  }
+  else{
+    association = await CompanyLoginAssociation.findOne({
+      include: [
+        {
+          model: User,
+          where: {
+            login: params.username,
+            password: params.password,
+            active: true
+          }
+        },
+        {
+          model: Company,
+          where: {
+            active: true
+          },
+          include: [
+            {
+              model: Store,
+            }
+          ]
+        }
+      ]
+    })
+  }
 
   if (!association) {
     return null
   }
 
 
-  return {...association.toJSON(), storeToken: params.storeToken} as UserLogin
+  return { ...association.toJSON(), storeToken: params.storeToken } as UserLogin
 }
 
 export async function WsAuthenticate(token: string) {
-const store = await Store.findOne({
+  const store = await Store.findOne({
     where: {
       storeToken: token
     }
   })
 
 
- 
-  
+
+
   return store
 }
 
-export async function GetLogin(userId: number){
+export async function GetLogin(userId: number) {
   const association = await CompanyLoginAssociation.findOne({
     include: [
       {
         model: User,
         where: {
-          id:userId
+          id: userId
         }
       }
     ]

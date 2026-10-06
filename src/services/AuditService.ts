@@ -1,8 +1,9 @@
 
 import { CloudAuditEntry, CloudAuditEntryItem, CloudProduct, Company, Store, User } from '../db/models.js'
 import { CreateAuditArgs } from "../db/types.js"
-import { Attributes } from '@sequelize/core'
+import { Attributes, Op } from '@sequelize/core'
 import { connection } from '../db/db.js'
+import { addDays } from 'date-fns'
 
 export async function GetCompanyToken(storeToken: string) {
 
@@ -15,7 +16,20 @@ export async function GetCompanyToken(storeToken: string) {
 }
 
 
+export async function GetAuditByStoreCode(code:string, start:Date, end:Date){
+  return CloudAuditEntry.findAll({
+    where:{
+      storeCode:code,
+       auditDate: {
+        [Op.gte]: start,
+        [Op.lt]: addDays(end, 1)
+      }
+    },
+    include:[CloudAuditEntryItem],
+    order:[["id", "desc"]]
 
+  })
+}
 
 
 export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs) {
@@ -85,9 +99,9 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
         productDescription: cloud.description,
         saleValueDifference: local.sellingValue - cloud.costValue,
         costValueDifference: local.costValue - cloud.costValue,
-        stockBalance: entry.total,
+        stockBalance: local.stockBalance,
         stockCount: entry.total,
-        stockDifference: entry.total - cloud.stockBalance,
+        stockDifference: local.stockBalance - entry.total
       })
 
 

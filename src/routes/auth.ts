@@ -21,35 +21,35 @@ type PreLoginSchemaType = Static<typeof PreLoginSchema>
 
 export default (fastify: FastifyInstance) => {
 
-fastify.get<{
+  fastify.get<{
     Querystring: PreLoginSchemaType
   }>('/prelogin', {
     schema: {
       querystring: PreLoginSchema
     }
   }, async (req, res) => {
-    const companies = await PreLogin({
+    const result = await PreLogin({
       username: req.query.username,
       password: req.query.password,
     })
-    
-    if (companies != null) {
-      const comp =  companies.map(c=>c.toJSON())
 
-      for(const c of comp){
+    if (result != null) {
+      const comp = result.companies.map(c => c.toJSON())
+
+      for (const c of comp) {
         // @ts-ignore
-        c.stores = c.stores.filter(s =>{
+        c.stores = c.stores.filter(s => {
           return isStoreAuthenticated(s.storeToken)
         })
       }
 
-      return comp
+      return { user: result.user, companies: comp }
     }
-    else{
-      return res.code(401).send({message: "Usuário e senha inválidos"})
+    else {
+      return res.code(401).send({ message: "Usuário e senha inválidos" })
     }
 
-    
+
   })
 
   fastify.post<{
@@ -64,7 +64,7 @@ fastify.get<{
       password: req.body.password,
       storeToken: req.body.storeToken
     })
-   
+
     if (login) {
       const token = SessionService.GenerateSessionToken()
       await SessionService.CreateSession(token, login)
@@ -75,15 +75,15 @@ fastify.get<{
       return { login, token }
     }
 
-    return res.code(401).send({message: "Usuário e senha inválidos"})
+    return res.code(401).send({ message: "Usuário e senha inválidos" })
   })
 
   fastify.get('/login', { preHandler: [fastify.authenticate] }, async (request, reply) => {
     const user = await GetLogin(request.session.userId)
-    if(user){
+    if (user) {
       return user.toJSON()
     }
-    reply.code(401).send({message: "Necessário login"})
+    reply.code(401).send({ message: "Necessário login" })
   })
 
   fastify.delete("/login", { preHandler: [fastify.authenticate] }, async (req, reply) => {
