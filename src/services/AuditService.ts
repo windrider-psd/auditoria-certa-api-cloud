@@ -16,17 +16,17 @@ export async function GetCompanyToken(storeToken: string) {
 }
 
 
-export async function GetAuditByStoreCode(code:string, start:Date, end:Date){
+export async function GetAuditByStoreCode(code: string, start: Date, end: Date) {
   return CloudAuditEntry.findAll({
-    where:{
-      storeCode:code,
-       auditDate: {
+    where: {
+      storeCode: code,
+      auditDate: {
         [Op.gte]: start,
         [Op.lt]: addDays(end, 1)
       }
     },
-    include:[CloudAuditEntryItem],
-    order:[["id", "desc"]]
+    include: [CloudAuditEntryItem],
+    order: [["id", "desc"]]
 
   })
 }
@@ -71,6 +71,25 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
       }
     }
 
+    let sellValue = 0;
+    let costValue = 0
+    let sellDiff = 0;
+    let costDiff = 0;
+    for (const entry of args.audit) {
+      if (entry.local == null) {
+        continue
+      }
+      sellValue += Number(entry.local.sellingValue) * entry.total
+      costValue += Number(entry.local.costValue) * entry.total
+      let dif = (entry.total - entry.local.stockBalance)
+      sellDiff += entry.local.sellingValue * dif
+      costDiff += entry.local.costValue * dif
+
+
+    }
+
+    console.log(sellValue, costValue, sellDiff, costDiff)
+
     const createdAudit = await CloudAuditEntry.create({
       storeName: company?.stores?.find((s) => s.storeToken === args.storeToken)?.name || '',
       auditDate: now,
@@ -79,7 +98,10 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
       storeCode: args.storeToken,
 
       loginName: user.login,
-
+      sellValue,
+      costDiff,
+      sellDiff,
+      costValue
     }, { returning: true })
 
 
@@ -89,19 +111,22 @@ export async function CreateAudit(user: Attributes<User>, args: CreateAuditArgs)
       }
       const cloud = entry.cloud
       const local = entry.local
+      let dif = entry.total - local.stockBalance
 
-
+      let val = local.sellingValue * dif
+      let val2 = local.costValue * dif
       await CloudAuditEntryItem.create({
         auditId: createdAudit.id,
         costPrice: local.costValue,
         salePrice: local.sellingValue,
         productId: cloud.id,
         productDescription: cloud.description,
-        saleValueDifference: local.sellingValue - cloud.costValue,
-        costValueDifference: local.costValue - cloud.costValue,
+        saleValueDifference: val,
+        costValueDifference: val2,
         stockBalance: local.stockBalance,
         stockCount: entry.total,
-        stockDifference: local.stockBalance - entry.total
+        stockDifference:  dif,
+
       })
 
 

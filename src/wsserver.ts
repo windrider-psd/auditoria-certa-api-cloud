@@ -79,7 +79,7 @@ export async function MakeWsRequest(storeToken:string, payload: WsRequestPayload
         payload: payload
     };
 
-    console.log("Sending WebSocket request", message);
+    
     socket.send(JSON.stringify(message));
     let resolveFunc: (res: WsResponseMessage) => void = () => { };
     let rejectFunc: (err: any) => void = () => { };
@@ -150,7 +150,7 @@ wss.on("connection", (socket: SocketClient) => {
     socket.on("message", async (raw) => {
         try {
             const message: WsMessage = JSON.parse(raw.toString());
-            console.log("Received WebSocket message", message);
+            
             if (message.type === "request" && socket.isAuthenticated) {
                 const response = await server.inject({
                     method: message.payload.method as any,
@@ -172,10 +172,10 @@ wss.on("connection", (socket: SocketClient) => {
             }
 
             else if (message.type === "response"  && socket.isAuthenticated) {
-                console.log("Received WebSocket response", message);
+                
                 const pending = pendingRequests.get(message.id);
                 if (pending) {
-                    console.log("Resolving pending request", message.id, message);
+                    
                     if (message.payload.status >= 400) {
                         pending.reject(message.payload.error);
                     }

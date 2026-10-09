@@ -269,6 +269,29 @@ export class CloudAuditEntry extends Model<
   declare loginName: CreationOptional<string>
 
   declare items?: NonAttribute<CloudAuditEntryItem[]>
+
+
+  @Attribute(DataTypes.DECIMAL(15, 3))
+  @Default(0)
+  @ColumnName('auditoria_valorvenda')
+  declare sellValue: CreationOptional<number>
+
+  @Attribute(DataTypes.DECIMAL(15, 3))
+  @Default(0)
+  @ColumnName('auditoria_valorcusto')
+  declare costValue: CreationOptional<number>
+
+  @Attribute(DataTypes.DECIMAL(15, 3))
+  @Default(0)
+  @ColumnName('auditoria_diferenca_venda')
+  declare sellDiff: CreationOptional<number>
+
+  @Attribute(DataTypes.DECIMAL(15, 3))
+  @Default(0)
+  @ColumnName('auditoria_diferenca_custo')
+  declare costDiff: CreationOptional<number>
+
+
 }
 
 

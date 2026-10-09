@@ -1,3 +1,4 @@
+import { Op } from '@sequelize/core'
 import { Company, CompanyLoginAssociation, Store, User } from '../db/models.js'
 import { UserLogin } from '../db/types.js'
 
@@ -14,6 +15,7 @@ interface PreLoginParams {
 }
 
 export async function PreLogin(params: PreLoginParams) {
+  
   const user = await User.findOne({
     where: {
       login: params.username,
@@ -21,17 +23,30 @@ export async function PreLogin(params: PreLoginParams) {
       active: true
     }
   })
+  
 
   if (!user) {
     return null
   }
+  const assoc = await CompanyLoginAssociation.findAll({
+    where:{
+      userId:user.id
+    }
+  })
 
+  
+  const valids = assoc.map(a => a.companyId);
+  console.log(valids)
   const validCompanies = await Company.findAll({
     where: {
-      active: true
+      active: true,
+      id: {
+      [Op.in]: valids
+    }
     },
     include: [Store]
   })
+  console.log(validCompanies.length)
 
   return {companies: validCompanies, user}
 }
