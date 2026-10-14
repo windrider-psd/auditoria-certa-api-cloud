@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify"
-import { GetCloudProductByCode, QueryCloudProduct, UpdateCloudProductEan } from "../services/ProductService.js"
+import { GetCloudProductByCode, GetCloudProductByEan, QueryCloudProduct, UpdateCloudProductEan } from "../services/ProductService.js"
 
 export default (fastify: FastifyInstance) => {
     fastify.addHook("preHandler", fastify.authenticate)
@@ -18,6 +18,15 @@ export default (fastify: FastifyInstance) => {
       const query = req.params.id
       
       return await GetCloudProductByCode(query, req.session.company.token)
+    })
+
+    fastify.get<{
+      Params: { ean: string }
+    }>('/by-ean/:ean', {
+    }, async (req, res) => {
+      const query = req.params.ean
+      
+      return await GetCloudProductByEan(query, req.session.company.token)
     })
 
     fastify.put<{
